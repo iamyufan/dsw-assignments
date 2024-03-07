@@ -1,0 +1,9 @@
+**/data/
+**/output/
+
+# Assignment 1
+**/output_bigram_counts/
+**/output_bigram_probabilities/
+
+# Any zip files
+*.zip
