@@ -8,13 +8,32 @@
 # %%
 import pandas as pd
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 from scipy.linalg import svd
 
 # Load the datasets
 businesses = pd.read_csv('data/business.csv', header=None, names=['business'])
 ratings = pd.read_csv('data/user-business.csv', header=None)
 ratings_test = pd.read_csv('data/user-business_test.csv', header=None)
+
+
+# %%
+# Function to compute the cosine similarity between two matrices
+def cosine_similarity(A, B):
+    """
+    Compute the cosine similarity between two matrices A and B.
+    
+    A and B must have the same number of features (columns), but they can have
+    different numbers of observations (rows).
+    """
+    # Normalize the rows of A and B
+    A_norm = A / np.linalg.norm(A, axis=1, keepdims=True)
+    B_norm = B / np.linalg.norm(B, axis=1, keepdims=True)
+    
+    # Compute the cosine similarity
+    cosine_similarities = np.dot(A_norm, B_norm.T)
+    
+    return cosine_similarities
+
 
 # %%
 # Wrap the recommendation systems into functions
@@ -32,7 +51,7 @@ def user_user_predictor(user_index, ratings, num_businesses=100):
 def item_item_predictor(user_index, ratings, num_businesses=100):
     ratings_transposed = ratings.T
     
-    business_cos_similarities = cosine_similarity(ratings_transposed.values)
+    business_cos_similarities = cosine_similarity(ratings_transposed.values, ratings_transposed.values)
     np.fill_diagonal(business_cos_similarities, 0)  # Exclude self-similarity
     
     user_ratings_for_items = ratings.iloc[user_index, :].values

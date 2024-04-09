@@ -8,7 +8,6 @@
 # %%
 import pandas as pd
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 
 # Load the datasets
 businesses = pd.read_csv('data/business.csv', header=None, names=['business'])
@@ -19,6 +18,24 @@ businesses
 
 # %%
 ratings
+
+# %%
+def cosine_similarity_(A, B):
+    """
+    Compute the cosine similarity between two matrices A and B.
+    
+    A and B must have the same number of features (columns), but they can have
+    different numbers of observations (rows).
+    """
+    # Normalize the rows of A and B
+    A_norm = A / np.linalg.norm(A, axis=1, keepdims=True)
+    B_norm = B / np.linalg.norm(B, axis=1, keepdims=True)
+    
+    # Compute the cosine similarity
+    cosine_similarities = np.dot(A_norm, B_norm.T)
+    
+    return cosine_similarities
+
 
 # %% [markdown]
 # ## Part A: user – user recommender system
@@ -31,7 +48,7 @@ ratings_excluded.iloc[:, :100] = 0
 # Calculate cosine similarity between Alex (4th user) and all users
 alex_ratings = ratings_excluded.iloc[3].values.reshape(1, -1)  # Alex's ratings with first 100 businesses excluded
 users_ratings = ratings_excluded.values
-cos_similarities = cosine_similarity(alex_ratings, users_ratings)[0]
+cos_similarities = cosine_similarity_(alex_ratings, users_ratings)[0]
 
 # Calculate rAlex,b for the first 100 businesses
 r_alex_b = np.dot(cos_similarities.reshape(1, -1), ratings.values[:, :100]).flatten()
@@ -54,10 +71,10 @@ print(result)
 ratings_transposed = ratings.T
 
 # Calculate cosine similarity between businesses
-business_cos_similarities = cosine_similarity(ratings_transposed.values)
+business_cos_similarities = cosine_similarity_(ratings_transposed.values, ratings_transposed.values)
 np.fill_diagonal(business_cos_similarities, 0)  # Zero out diagonal to exclude self-similarity
 
-# Alex's ratings for items excluding first 100 businesses
+# Alex's ratings for items
 alex_ratings_for_items = ratings.iloc[3, :].values
 
 # Calculate rAlex,b for each of the first 100 businesses
@@ -70,7 +87,7 @@ top_5_scores = r_alex_b[top_5_indices]
 
 # Convert to a dataframe for better visualization
 result = pd.DataFrame({'business': top_5_businesses, 'score': top_5_scores})
-print("Top 5 businesses recommended to Alex using user-user collaborative filtering:")
+print("Top 5 businesses recommended to Alex using item-item collaborative filtering:")
 print(result)
 
 # %% [markdown]
