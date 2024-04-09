@@ -17,23 +17,12 @@ ratings_test = pd.read_csv('data/user-business_test.csv', header=None)
 
 
 # %%
-# Function to compute the cosine similarity between two matrices
-def cosine_similarity(A, B):
-    """
-    Compute the cosine similarity between two matrices A and B.
-    
-    A and B must have the same number of features (columns), but they can have
-    different numbers of observations (rows).
-    """
-    # Normalize the rows of A and B
-    A_norm = A / np.linalg.norm(A, axis=1, keepdims=True)
-    B_norm = B / np.linalg.norm(B, axis=1, keepdims=True)
-    
-    # Compute the cosine similarity
-    cosine_similarities = np.dot(A_norm, B_norm.T)
-    
-    return cosine_similarities
-
+from a2 import (
+    cosine_similarity_,
+    user_user_predictor,
+    item_item_predictor,
+    latent_factor_predictor,
+)
 
 # %%
 # Wrap the recommendation systems into functions
@@ -70,6 +59,14 @@ def latent_factor_predictor(user_index, ratings, num_features=10, num_businesses
     R_star = np.dot(U_k, np.dot(sigma_k, VT_k))
     return R_star[:, :num_businesses][user_index]
 
+
+# %%
+from a2 import (
+    cosine_similarity_,
+    user_user_predictor,
+    item_item_predictor,
+    latent_factor_predictor,
+)
 
 # %%
 def convert_predictions_to_binary_by_threshold(predictions, threshold):
